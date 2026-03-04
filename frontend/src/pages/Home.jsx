@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import Header from '../components/Header';
+import CreateDemandModal from '../components/CreateDemandModal';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { Heart, Share2, MessageSquare, MapPin, X, Camera, Euro } from 'lucide-react';
+import { Heart, Share2, MessageSquare, MapPin, X, Camera } from 'lucide-react';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { useNavigate } from 'react-router-dom';
@@ -139,6 +140,7 @@ const Home = () => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState(mockPosts);
   const [showBanner, setShowBanner] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const handleLike = (postId) => {
     setPosts(prev =>
@@ -245,7 +247,7 @@ const Home = () => {
                 </div>
               </div>
 
-              <Button className="w-full bg-green-600 hover:bg-green-700 text-white h-9 text-sm">
+              <Button className="w-full bg-green-600 hover:bg-green-700 text-white h-9 text-sm" onClick={() => setShowCreateModal(true)}>
                 Publicar Pedido
               </Button>
             </Card>
@@ -263,6 +265,9 @@ const Home = () => {
           </div>
         </div>
       </div>
+
+      {/* Create Demand Modal */}
+      <CreateDemandModal open={showCreateModal} onOpenChange={setShowCreateModal} />
     </div>
   );
 };

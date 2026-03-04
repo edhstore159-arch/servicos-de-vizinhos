@@ -25,7 +25,7 @@ const Mapa = () => {
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: 'AIzaSyBs0t0yYN5vYfXD_1uJ9Eqq4mHqR5bKqLI' // Demo key - substitua pela sua
+    googleMapsApiKey: 'AIzaSyDUxe-HLztnRiQ8mFew15NCs2TWBUJ8Jl0'
   });
 
   const onLoad = useCallback((map) => {

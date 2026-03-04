@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Header from '../components/Header';
+import AutoJobSearch from '../components/AutoJobSearch';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -48,6 +49,9 @@ const Empregos = () => {
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Vagas de Emprego</h1>
           <p className="text-sm text-gray-600">Busque em múltiplos sites ou veja nossas vagas</p>
         </div>
+
+        {/* Auto Job Search */}
+        <AutoJobSearch />
 
         {/* Job Boards Section */}
         <Card className="p-4 mb-4">

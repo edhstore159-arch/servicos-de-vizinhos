@@ -1,151 +1,265 @@
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Search, MapPin, Briefcase } from 'lucide-react';
-import { jobCategories, searchTips } from '../mock/data';
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { Heart, Share2, MessageSquare, MapPin, X, Camera, Euro } from 'lucide-react';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
 import { useNavigate } from 'react-router-dom';
+
+// Mock posts/demandas
+const mockPosts = [
+  {
+    id: '1',
+    userName: 'João Silva',
+    userAvatar: 'https://i.pravatar.cc/150?img=12',
+    isPro: true,
+    time: 'Há 3h',
+    title: 'Preciso de ajuda com instalação elétrica',
+    description: 'Olá, estou precisando de um eletricista para fazer algumas instalações na minha casa. Tenho 3 pontos de tomada para instalar e preciso trocar o disjuntor principal. Trabalho de aproximadamente 4 horas.',
+    location: 'São Paulo, SP - 5 km',
+    budget: 'R$ 300',
+    category: 'Eletricista',
+    likes: 12,
+    responses: 5
+  },
+  {
+    id: '2',
+    userName: 'Maria Santos',
+    userAvatar: 'https://i.pravatar.cc/150?img=45',
+    isPro: false,
+    time: 'Há 5h',
+    title: 'Busco professor de matemática',
+    description: 'Preciso de professor particular de matemática para minha filha que está no ensino médio. Aulas 2x por semana, preferencialmente aos sábados pela manhã.',
+    location: 'Rio de Janeiro, RJ - 8 km',
+    budget: 'R$ 80/aula',
+    category: 'Professor',
+    likes: 8,
+    responses: 12
+  },
+  {
+    id: '3',
+    userName: 'Carlos Oliveira',
+    userAvatar: 'https://i.pravatar.cc/150?img=33',
+    isPro: false,
+    time: 'Há 1 dia',
+    title: 'Desenvolvedor para pequeno projeto',
+    description: 'Procuro desenvolvedor para criar um site institucional simples. Preciso de algo profissional mas sem muita complexidade. Prazo de 2 semanas.',
+    location: 'Belo Horizonte, MG - 3 km',
+    budget: 'R$ 2.000',
+    category: 'Desenvolvedor',
+    likes: 15,
+    responses: 8
+  }
+];
+
+const PostCard = ({ post, onLike, onRespond }) => {
+  return (
+    <Card className="p-3 mb-2 hover:shadow-md transition-shadow">
+      {/* Header */}
+      <div className="flex items-start space-x-2 mb-2">
+        <Avatar className="w-9 h-9">
+          <AvatarImage src={post.userAvatar} alt={post.userName} />
+          <AvatarFallback>{post.userName.charAt(0)}</AvatarFallback>
+        </Avatar>
+        <div className="flex-1">
+          <div className="flex items-center space-x-2">
+            <h3 className="font-semibold text-sm">{post.userName}</h3>
+            {post.isPro && (
+              <Badge variant="outline" className="text-xs px-1.5 py-0 bg-purple-50 text-purple-700 border-purple-200">
+                PRO
+              </Badge>
+            )}
+          </div>
+          <p className="text-xs text-gray-500">{post.time}</p>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="mb-2">
+        <h4 className="font-medium text-sm mb-2">{post.title}</h4>
+        <p className="text-sm text-gray-700 line-clamp-3">{post.description}</p>
+      </div>
+
+      {/* Location & Budget */}
+      <div className="flex items-center justify-between mb-2 text-xs">
+        <div className="flex items-center text-gray-600">
+          <MapPin className="w-3.5 h-3.5 mr-1" />
+          <span>{post.location}</span>
+        </div>
+        <div className="font-semibold text-gray-800">
+          Orçamento: <span className="text-green-600">{post.budget}</span>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+        <div className="flex items-center space-x-4 text-xs text-gray-600">
+          <span>{post.likes} Curtidas</span>
+          <span>{post.responses} respostas</span>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center space-x-2 mt-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex-1 text-xs h-8"
+          onClick={() => onLike(post.id)}
+        >
+          <Heart className="w-4 h-4 mr-1" />
+          Curtir
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex-1 text-xs h-8"
+        >
+          <Share2 className="w-4 h-4 mr-1" />
+          Compartilhar
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex-1 text-xs h-8"
+          onClick={() => onRespond(post.id)}
+        >
+          <MessageSquare className="w-4 h-4 mr-1" />
+          Responder
+        </Button>
+      </div>
+    </Card>
+  );
+};
 
 const Home = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [location, setLocation] = useState('São Paulo');
+  const [posts, setPosts] = useState(mockPosts);
+  const [showBanner, setShowBanner] = useState(true);
 
-  const handleSearch = () => {
-    navigate(`/empregos?q=${searchQuery}&loc=${location}`);
+  const handleLike = (postId) => {
+    setPosts(prev =>
+      prev.map(p =>
+        p.id === postId ? { ...p, likes: p.likes + 1 } : p
+      )
+    );
   };
 
-  const quickSearch = (category) => {
-    navigate(`/empregos?q=${category}`);
+  const handleRespond = (postId) => {
+    navigate(`/mensagens`);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white pb-16 md:pb-0">
+    <div className="min-h-screen bg-[#F5F8FA] pb-16 md:pb-0">
       <Header />
 
-      <div className="max-w-6xl mx-auto px-3 py-6">
-        {/* Hero Section */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center space-x-2 bg-pink-50 px-4 py-2 rounded-full mb-4">
-            <Briefcase className="w-5 h-5 text-pink-600" />
-            <span className="text-sm font-semibold text-pink-600">Empregos</span>
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-            Encontre seu próximo emprego
-          </h1>
-          <p className="text-gray-600 text-sm md:text-base">
-            Busque vagas em múltiplos sites ou acesse nossos parceiros
-          </p>
-        </div>
-
-        {/* Search Bar */}
-        <Card className="p-4 mb-6 shadow-lg">
-          <div className="flex flex-col md:flex-row gap-2">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-              <Input
-                placeholder="Cargo, empresa ou palavra-chave"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-11"
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              />
+      {/* Banner */}
+      {showBanner && (
+        <div className="bg-[#FFE5E0] border-b border-[#FFD0C7]">
+          <div className="max-w-7xl mx-auto px-3 py-1.5 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <MapPin className="w-4 h-4 text-[#FF6B6B]" />
+              <p className="text-xs text-gray-700">
+                Adicione mais créditos para acessar recursos exclusivos!
+              </p>
             </div>
-            <div className="flex-1 relative">
-              <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-              <Input
-                placeholder="Localização"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="pl-10 h-11"
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              />
-            </div>
-            <Button
-              onClick={handleSearch}
-              className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white h-11 px-8"
-            >
-              <Search className="w-4 h-4 mr-2" />
-              Buscar
-            </Button>
-          </div>
-        </Card>
-
-        {/* Popular Categories */}
-        <div className="mb-6">
-          <div className="flex items-center space-x-2 mb-3">
-            <span className="text-sm font-semibold text-gray-700">✨ Popular:</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {jobCategories.map((category) => (
-              <Badge
-                key={category}
-                variant="outline"
-                className="cursor-pointer hover:bg-green-50 hover:border-green-500 hover:text-green-700 transition-colors px-3 py-1.5 text-sm"
-                onClick={() => quickSearch(category)}
+            <div className="flex items-center space-x-2">
+              <Button
+                size="sm"
+                className="bg-[#FF9B8A] hover:bg-[#FF8A79] text-white h-7 text-xs px-3"
+                onClick={() => navigate('/creditos')}
               >
-                {category}
-              </Badge>
-            ))}
+                Comprar Créditos
+              </Button>
+              <button
+                onClick={() => setShowBanner(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
+      )}
 
-        {/* Quick Search Section */}
-        <Card className="p-6 mb-6 bg-gradient-to-br from-pink-50 to-orange-50">
-          <div className="flex items-center space-x-2 mb-4">
-            <Briefcase className="w-5 h-5 text-pink-600" />
-            <h2 className="text-lg font-bold text-gray-900">Encontre seu próximo emprego</h2>
-          </div>
-          <p className="text-sm text-gray-600 mb-4">
-            Busque vagas ou acesse diretamente nossos parceiros
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              className="border-pink-300 text-pink-700 hover:bg-pink-100"
-              onClick={() => quickSearch('Desenvolvedor')}
-            >
-              Buscar "Desenvolvedor"
-            </Button>
-            <Button
-              variant="outline"
-              className="border-pink-300 text-pink-700 hover:bg-pink-100"
-              onClick={() => quickSearch('Vendedor')}
-            >
-              Buscar "Vendedor"
-            </Button>
-            <Button
-              variant="outline"
-              className="border-pink-300 text-pink-700 hover:bg-pink-100"
-              onClick={() => quickSearch('Motorista')}
-            >
-              Buscar "Motorista"
-            </Button>
-          </div>
-        </Card>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-3 py-3">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          {/* Left Column - Feed */}
+          <div className="lg:col-span-2">
+            {/* Feed Header */}
+            <div className="flex items-center space-x-2 mb-2">
+              <MapPin className="w-4 h-4 text-gray-600" />
+              <h2 className="text-sm font-semibold">Feed Público</h2>
+              <span className="text-xs text-gray-500">Atualizado agora</span>
+            </div>
 
-        {/* Search Tips */}
-        <div>
-          <div className="flex items-center space-x-2 mb-4">
-            <span className="text-xl">💡</span>
-            <h2 className="text-lg font-bold text-gray-900">Dicas para sua busca</h2>
+            {/* Posts Feed */}
+            <div className="space-y-0">
+              {posts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  onLike={handleLike}
+                  onRespond={handleRespond}
+                />
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {searchTips.map((tip) => (
-              <Card key={tip.number} className="p-4 hover:shadow-md transition-shadow">
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                    {tip.number}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-sm text-gray-900 mb-1">{tip.title}</h3>
-                    <p className="text-xs text-gray-600">{tip.description}</p>
-                  </div>
+
+          {/* Right Column - Sidebar */}
+          <div className="space-y-2">
+            {/* Quick Post Card */}
+            <Card className="p-3 mb-2">
+              <h3 className="font-semibold text-sm mb-2">Olá!</h3>
+              
+              <div className="mb-2">
+                <Label className="text-xs mb-2 block">Adicione fotos</Label>
+                <p className="text-xs text-gray-600 mb-2">
+                  Aumente suas chances em 25% ilustrando sua necessidade
+                </p>
+                <div className="flex space-x-2">
+                  {[0, 1, 2].map((index) => (
+                    <label
+                      key={index}
+                      className="w-14 h-14 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-green-500 transition-colors"
+                    >
+                      <Camera className="w-4 h-4 text-gray-400" />
+                      <input type="file" accept="image/*" className="hidden" />
+                    </label>
+                  ))}
                 </div>
-              </Card>
-            ))}
+              </div>
+
+              <div className="mb-2">
+                <Label className="text-xs mb-2 block">Endereço</Label>
+                <div className="flex items-center space-x-2">
+                  <MapPin className="w-4 h-4 text-gray-500" />
+                  <Input
+                    placeholder="Seu endereço"
+                    className="text-xs h-8"
+                  />
+                </div>
+              </div>
+
+              <Button className="w-full bg-green-600 hover:bg-green-700 text-white h-9 text-sm">
+                Publicar Pedido
+              </Button>
+            </Card>
+
+            {/* Earn Money Card */}
+            <Card className="p-3 bg-gradient-to-br from-orange-50 to-pink-50">
+              <h3 className="font-semibold text-sm mb-2">Arredonde sua renda</h3>
+              <p className="text-xs text-gray-700 mb-2">
+                Responda aos pedidos próximos e gere renda extra
+              </p>
+              <Button className="w-full bg-[#FF9B8A] hover:bg-[#FF8A79] text-white h-9 text-sm">
+                Oferecer Serviços
+              </Button>
+            </Card>
           </div>
         </div>
       </div>

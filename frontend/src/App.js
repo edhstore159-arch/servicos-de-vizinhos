@@ -6,6 +6,7 @@ import Mapa from './pages/Mapa';
 import Mensagens from './pages/Mensagens';
 import Perfil from './pages/Perfil';
 import Creditos from './pages/Creditos';
+import Abonamento from './pages/Abonamento';
 import { Toaster } from './components/ui/toaster';
 import './App.css';
 
@@ -19,6 +20,7 @@ function App() {
         <Route path="/mensagens" element={<Mensagens />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/creditos" element={<Creditos />} />
+        <Route path="/abonamento" element={<Abonamento />} />
       </Routes>
       <Toaster />
     </BrowserRouter>

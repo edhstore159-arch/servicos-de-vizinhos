@@ -172,9 +172,9 @@ const Home = () => {
               <Button
                 size="sm"
                 className="bg-[#FF9B8A] hover:bg-[#FF8A79] text-white h-7 text-xs px-3"
-                onClick={() => navigate('/creditos')}
+                onClick={() => navigate('/abonamento')}
               >
-                Comprar Créditos
+                Assinar Premier
               </Button>
               <button
                 onClick={() => setShowBanner(false)}

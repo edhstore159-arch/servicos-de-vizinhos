@@ -8,6 +8,7 @@ import Mensagens from './pages/Mensagens';
 import Perfil from './pages/Perfil';
 import Creditos from './pages/Creditos';
 import Abonamento from './pages/Abonamento';
+import Assinatura from './pages/Assinatura';
 import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
 import Orcamentos from './pages/admin/Orcamentos';
@@ -28,6 +29,7 @@ function App() {
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/creditos" element={<Creditos />} />
         <Route path="/abonamento" element={<Abonamento />} />
+        <Route path="/assinatura" element={<Assinatura />} />
         
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>

@@ -1,12 +1,14 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Home, Briefcase, PlusCircle, MessageCircle, MapPin, User } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Home, Briefcase, PlusCircle, MessageCircle, MapPin, User, LogOut, Settings, CreditCard } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Badge } from './ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { getCurrentUser } from '../mock/data';
 
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const user = getCurrentUser();
 
   const navItems = [
@@ -16,6 +18,11 @@ const Header = () => {
     { path: '/mapa', label: 'Mapa', icon: MapPin },
     { path: '/perfil', label: 'Perfil', icon: User }
   ];
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    navigate('/landing');
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -51,17 +58,48 @@ const Header = () => {
             })}
           </nav>
 
-          {/* User Profile */}
+          {/* User Profile with Dropdown */}
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2 bg-yellow-50 px-3 py-1 rounded-full">
               <span className="text-sm font-semibold text-yellow-700">💳 {user.credits}</span>
             </div>
-            <Link to="/perfil" className="flex items-center space-x-2">
-              <Avatar className="w-8 h-8">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-            </Link>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium">{user.name}</p>
+                    <p className="text-xs text-gray-500">{user.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/perfil')}>
+                  <User className="w-4 h-4 mr-2" />
+                  Meu Perfil
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/creditos')}>
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Comprar Créditos
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/admin')}>
+                  <Settings className="w-4 h-4 mr-2" />
+                  Dashboard Admin
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>

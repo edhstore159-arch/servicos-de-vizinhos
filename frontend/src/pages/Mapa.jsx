@@ -1,15 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Header from '../components/Header';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { MapPin, Navigation, Star } from 'lucide-react';
+import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import { mockProviders, serviceCategories } from '../mock/data';
+
+const mapContainerStyle = {
+  width: '100%',
+  height: '400px'
+};
+
+const center = {
+  lat: -23.5505,
+  lng: -46.6333
+};
 
 const Mapa = () => {
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [radius, setRadius] = useState('10');
+  const [map, setMap] = useState(null);
+
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: 'AIzaSyBs0t0yYN5vYfXD_1uJ9Eqq4mHqR5bKqLI' // Demo key - substitua pela sua
+  });
+
+  const onLoad = useCallback((map) => {
+    setMap(map);
+  }, []);
+
+  const onUnmount = useCallback((map) => {
+    setMap(null);
+  }, []);
 
   const filteredProviders = mockProviders.filter(provider => {
     return selectedCategory === 'Todos' || provider.category === selectedCategory;
@@ -77,21 +102,46 @@ const Mapa = () => {
           </div>
         </Card>
 
-        {/* Map Placeholder */}
+        {/* Google Map */}
         <Card className="mb-3 overflow-hidden">
-          <div className="h-96 bg-gray-100 relative flex items-center justify-center">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-green-50 opacity-50"></div>
-            <div className="relative text-center">
-              <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-600 font-medium">Mapa de Prestadores</p>
-              <p className="text-sm text-gray-500 mt-1">Integração com Google Maps</p>
+          {isLoaded ? (
+            <GoogleMap
+              mapContainerStyle={mapContainerStyle}
+              center={center}
+              zoom={13}
+              onLoad={onLoad}
+              onUnmount={onUnmount}
+              options={{
+                zoomControl: true,
+                streetViewControl: false,
+                mapTypeControl: false,
+                fullscreenControl: true,
+              }}
+            >
+              {filteredProviders.map((provider) => (
+                <Marker
+                  key={provider.id}
+                  position={provider.location}
+                  title={provider.name}
+                  icon={{
+                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                      <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="16" cy="16" r="14" fill="#10b981" stroke="white" stroke-width="3"/>
+                      </svg>
+                    `),
+                    scaledSize: new window.google.maps.Size(32, 32),
+                  }}
+                />
+              ))}
+            </GoogleMap>
+          ) : (
+            <div className="h-96 bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
+              <div className="text-center">
+                <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-3 animate-pulse" />
+                <p className="text-gray-600 font-medium">Carregando mapa...</p>
+              </div>
             </div>
-            
-            {/* Mock Markers */}
-            <div className="absolute top-1/4 left-1/3 w-6 h-6 bg-red-500 rounded-full border-2 border-white shadow-lg animate-bounce"></div>
-            <div className="absolute top-1/2 right-1/3 w-6 h-6 bg-green-500 rounded-full border-2 border-white shadow-lg"></div>
-            <div className="absolute bottom-1/3 left-1/2 w-6 h-6 bg-blue-500 rounded-full border-2 border-white shadow-lg"></div>
-          </div>
+          )}
         </Card>
 
         {/* Providers List */}

@@ -1,180 +1,199 @@
-// Mock data para allovoisins clone
+// Mock data para servivizinhos - Busca de empregos e serviços
 
-export const mockUsers = [
+export const mockJobs = [
   {
     id: '1',
-    name: 'Hassan H.',
-    avatar: 'https://i.pravatar.cc/150?img=12',
-    location: 'Paris (Faubourg du Roule 8) - 17 km',
+    title: 'Desenvolvedor Full Stack',
+    company: 'Tech Solutions',
+    location: 'São Paulo, SP',
+    salary: 'R$ 8.000 - R$ 12.000',
+    type: 'CLT',
+    category: 'Desenvolvedor',
+    description: 'Procuramos desenvolvedor full stack com experiência em React e Node.js. Trabalho híbrido, 3x na semana presencial.',
+    postedAt: '2026-03-04T10:00:00',
+    logo: 'https://i.pravatar.cc/150?img=1'
+  },
+  {
+    id: '2',
+    title: 'Vendedor Externo',
+    company: 'Distribuidora ABC',
+    location: 'Rio de Janeiro, RJ',
+    salary: 'R$ 2.500 + comissões',
+    type: 'CLT',
+    category: 'Vendedor',
+    description: 'Vaga para vendedor externo com experiência em vendas B2B. Carro da empresa fornecido.',
+    postedAt: '2026-03-04T09:30:00',
+    logo: 'https://i.pravatar.cc/150?img=2'
+  },
+  {
+    id: '3',
+    title: 'Motorista de Aplicativo',
+    company: 'Autônomo',
+    location: 'Belo Horizonte, MG',
+    salary: 'R$ 3.000 - R$ 5.000',
+    type: 'Autônomo',
+    category: 'Motorista',
+    description: 'Seja seu próprio chefe! Trabalhe como motorista de aplicativo com flexibilidade de horários.',
+    postedAt: '2026-03-03T18:00:00',
+    logo: 'https://i.pravatar.cc/150?img=3'
+  },
+  {
+    id: '4',
+    title: 'Recepcionista',
+    company: 'Clínica Saúde+',
+    location: 'Curitiba, PR',
+    salary: 'R$ 2.200',
+    type: 'CLT',
+    category: 'Recepcionista',
+    description: 'Recepcionista para clínica médica. Horário comercial, segunda a sexta.',
+    postedAt: '2026-03-03T16:00:00',
+    logo: 'https://i.pravatar.cc/150?img=4'
+  },
+  {
+    id: '5',
+    title: 'Eletricista Predial',
+    company: 'Construtora Silva',
+    location: 'Brasília, DF',
+    salary: 'R$ 3.500',
+    type: 'CLT',
+    category: 'Eletricista',
+    description: 'Eletricista com experiência em instalações prediais. NR10 obrigatória.',
+    postedAt: '2026-03-03T14:00:00',
+    logo: 'https://i.pravatar.cc/150?img=5'
+  }
+];
+
+export const mockProviders = [
+  {
+    id: '1',
+    name: 'João Silva',
+    category: 'Bricolagem',
+    avatar: 'https://i.pravatar.cc/150?img=11',
     rating: 4.8,
-    reviews: 24
+    reviewCount: 45,
+    location: { lat: -23.5505, lng: -46.6333 },
+    address: 'São Paulo, SP',
+    distance: '2.5 km'
   },
   {
     id: '2',
-    name: 'Marie L.',
-    avatar: 'https://i.pravatar.cc/150?img=45',
-    location: 'Lyon (Part-Dieu) - 8 km',
+    name: 'Maria Santos',
+    category: 'Limpeza',
+    avatar: 'https://i.pravatar.cc/150?img=47',
     rating: 4.9,
-    reviews: 32
+    reviewCount: 78,
+    location: { lat: -23.5605, lng: -46.6433 },
+    address: 'São Paulo, SP',
+    distance: '3.8 km'
   },
   {
     id: '3',
-    name: 'Thomas B.',
+    name: 'Carlos Oliveira',
+    category: 'Transporte',
     avatar: 'https://i.pravatar.cc/150?img=33',
-    location: 'Marseille (Vieux Port) - 5 km',
     rating: 4.7,
-    reviews: 18
-  },
-  {
-    id: '4',
-    name: 'Sophie M.',
-    avatar: 'https://i.pravatar.cc/150?img=48',
-    location: 'Toulouse (Capitole) - 12 km',
-    rating: 5.0,
-    reviews: 41
-  },
-  {
-    id: '5',
-    name: 'Lucas D.',
-    avatar: 'https://i.pravatar.cc/150?img=52',
-    location: 'Nice (Promenade des Anglais) - 6 km',
-    rating: 4.6,
-    reviews: 15
+    reviewCount: 32,
+    location: { lat: -23.5405, lng: -46.6233 },
+    address: 'São Paulo, SP',
+    distance: '1.2 km'
   }
 ];
 
-export const mockDemands = [
-  {
-    id: '1',
-    userId: '1',
-    title: 'Mécanicien professionnel pour changer une butée hydraulique',
-    description: "Bonjour, je cherche mécanicien professionnel pour changer une butée hydraulique de ma megane 4 1.5 dci. Je voudrais vous informer que j'ai déjà remplacé un kit complet d'embrayage de la marque LuK en Algérie. Depuis, lorsque je roule environ 20 kilomètres, tout va bien au début, mais une fois le moteur bien chaud, l'embrayage commence à grincer, avec un bruit de grincement au niveau de la boîte. En plus, les vitesses, notamment la première et la deuxième, passent mal, elles claquent. Le bimasse et l'embrayage sont neufs, mais je pense que le problème vient de la butée.",
-    budget: 'Sur devis',
-    category: 'Mécanique',
-    location: 'Paris (Faubourg du Roule 8) - 17 km',
-    postedAt: '2026-03-04T10:35:00',
-    likes: 1,
-    recommends: 0,
-    responses: 1,
-    isPro: true
-  },
-  {
-    id: '2',
-    userId: '2',
-    title: 'Aide pour déménagement appartement T3',
-    description: "Je recherche une personne disponible ce week-end pour m'aider à déménager mon appartement T3 vers une maison. J'ai déjà loué un camion, j'aurais besoin d'aide pour porter les meubles et cartons. Déménagement local, environ 15km de distance.",
-    budget: '80€',
-    category: 'Déménagement',
-    location: 'Lyon (Part-Dieu) - 8 km',
-    postedAt: '2026-03-04T09:20:00',
-    likes: 5,
-    recommends: 2,
-    responses: 3,
-    isPro: false
-  },
-  {
-    id: '3',
-    userId: '3',
-    title: 'Cours particuliers de mathématiques niveau lycée',
-    description: "Bonjour, je cherche un professeur de mathématiques pour ma fille en Terminale S. Elle a besoin d'aide pour préparer son bac, notamment en géométrie dans l'espace et probabilités. Cours à domicile préférés, 2h par semaine.",
-    budget: '25€/h',
-    category: 'Cours particuliers',
-    location: 'Marseille (Vieux Port) - 5 km',
-    postedAt: '2026-03-04T08:15:00',
-    likes: 3,
-    recommends: 1,
-    responses: 5,
-    isPro: false
-  },
-  {
-    id: '4',
-    userId: '4',
-    title: 'Garde d\'enfants mercredi après-midi',
-    description: "Je cherche une personne de confiance pour garder mes deux enfants (5 et 8 ans) tous les mercredis après-midi de 14h à 18h. Activités ludiques et aide aux devoirs appréciées. Longue durée souhaitée.",
-    budget: '12€/h',
-    category: 'Garde d\'enfants',
-    location: 'Toulouse (Capitole) - 12 km',
-    postedAt: '2026-03-03T16:45:00',
-    likes: 8,
-    recommends: 4,
-    responses: 7,
-    isPro: false
-  },
-  {
-    id: '5',
-    userId: '5',
-    title: 'Réparation fuite robinet cuisine',
-    description: "Mon robinet de cuisine fuit depuis hier soir. La fuite vient de la base du robinet. J'ai coupé l'arrivée d'eau en attendant. Intervention rapide souhaitée, je peux me rendre disponible facilement.",
-    budget: 'À négocier',
-    category: 'Plomberie',
-    location: 'Nice (Promenade des Anglais) - 6 km',
-    postedAt: '2026-03-03T15:30:00',
-    likes: 2,
-    recommends: 1,
-    responses: 4,
-    isPro: false
-  }
+export const jobCategories = [
+  'Popular',
+  'Desenvolvedor',
+  'Vendedor',
+  'Motorista',
+  'Recepcionista',
+  'Eletricista',
+  'Enfermeiro',
+  'Professor',
+  'Designer'
 ];
 
-export const mockThematiques = [
-  {
-    id: '1',
-    title: 'J\'ai besoin d\'aide pour des petits travaux',
-    image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&h=300&fit=crop',
-    likes: '9.6k',
-    shares: '2.6k'
-  },
-  {
-    id: '2',
-    title: 'J\'ai besoin d\'aide pour le ménage',
-    image: 'https://images.unsplash.com/photo-1563453392212-326f5e854473?w=400&h=300&fit=crop',
-    likes: '12.5k',
-    shares: '3.3k'
-  },
-  {
-    id: '3',
-    title: 'J\'entretiens mon véhicule',
-    image: 'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=400&h=300&fit=crop',
-    likes: '5.1k',
-    shares: '1.0k'
-  }
+export const serviceCategories = [
+  'Todos',
+  'Bricolagem',
+  'Limpeza',
+  'Transporte',
+  'Aulas',
+  'Informática',
+  'Beleza',
+  'Jardinagem'
 ];
 
-export const mockCategories = [
-  'Bricolage',
-  'Jardinage',
-  'Déménagement',
-  'Ménage',
-  'Mécanique',
-  'Plomberie',
-  'Électricité',
-  'Cours particuliers',
-  'Garde d\'enfants',
-  'Informatique',
-  'Peinture',
-  'Réparation'
-];
-
-export const mockMessages = [
+export const pricingPlans = [
   {
-    id: '1',
-    fromUserId: '2',
-    toUserId: '1',
-    demandId: '1',
-    message: 'Bonjour, je suis disponible pour vous aider avec votre problème de mécanique.',
-    timestamp: '2026-03-04T11:00:00',
-    read: false
+    id: 'basic',
+    name: 'Básico',
+    credits: 10,
+    price: 29.90,
+    features: [
+      '10 créditos',
+      'Busca de empregos',
+      'Contato com prestadores',
+      'Suporte por email'
+    ]
+  },
+  {
+    id: 'pro',
+    name: 'Profissional',
+    credits: 30,
+    price: 79.90,
+    popular: true,
+    features: [
+      '30 créditos',
+      'Busca ilimitada',
+      'Destaque no mapa',
+      'Alertas personalizados',
+      'Suporte prioritário'
+    ]
+  },
+  {
+    id: 'premium',
+    name: 'Premium',
+    credits: 100,
+    price: 199.90,
+    features: [
+      '100 créditos',
+      'Todos os recursos Pro',
+      'Perfil verificado',
+      'Análises detalhadas',
+      'Suporte 24/7'
+    ]
   }
 ];
 
 export const getCurrentUser = () => ({
   id: 'current',
-  name: 'Francis De France F.',
-  avatar: 'https://i.pravatar.cc/150?img=68',
-  email: 'francis@example.com',
-  location: 'Paris (Châtelet)',
-  phone: '+33 6 12 34 56 78',
-  isPremier: true,
-  rating: 4.9,
-  reviews: 28
+  name: 'Maria Silva',
+  email: 'maria@example.com',
+  avatar: 'https://i.pravatar.cc/150?img=48',
+  location: 'São Paulo, SP',
+  phone: '+55 11 98765-4321',
+  credits: 5,
+  isPremium: false
 });
+
+export const searchTips = [
+  {
+    number: 1,
+    title: 'Mantenha seu currículo atualizado',
+    description: 'Cadastre-se nos sites parceiros'
+  },
+  {
+    number: 2,
+    title: 'Use palavras-chave específicas',
+    description: 'Busque por cargo ou habilidades'
+  },
+  {
+    number: 3,
+    title: 'Configure alertas de vagas',
+    description: 'Receba notificações por email'
+  },
+  {
+    number: 4,
+    title: 'Prepare-se para entrevistas',
+    description: 'Pesquise sobre as empresas'
+  }
+];

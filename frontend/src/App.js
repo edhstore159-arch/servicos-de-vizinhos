@@ -1,10 +1,11 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
-import Demande from './pages/Demande';
-import Messages from './pages/Messages';
-import Profile from './pages/Profile';
-import Offreurs from './pages/Offreurs';
+import Empregos from './pages/Empregos';
+import Mapa from './pages/Mapa';
+import Mensagens from './pages/Mensagens';
+import Perfil from './pages/Perfil';
+import Creditos from './pages/Creditos';
 import { Toaster } from './components/ui/toaster';
 import './App.css';
 
@@ -13,10 +14,11 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/demande" element={<Demande />} />
-        <Route path="/offreurs" element={<Offreurs />} />
-        <Route path="/messages" element={<Messages />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/empregos" element={<Empregos />} />
+        <Route path="/mapa" element={<Mapa />} />
+        <Route path="/mensagens" element={<Mensagens />} />
+        <Route path="/perfil" element={<Perfil />} />
+        <Route path="/creditos" element={<Creditos />} />
       </Routes>
       <Toaster />
     </BrowserRouter>

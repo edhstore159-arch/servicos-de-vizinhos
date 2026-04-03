@@ -38,6 +38,8 @@ Construir uma aplicação chamada "servivizinhos" inspirada no allovoisins.com -
 - `POST /api/auth/register` - Registro de usuário
 - `POST /api/auth/login` - Login
 - `GET /api/auth/me` - Dados do usuário logado
+- `POST /api/auth/forgot-password` - Solicitar código de recuperação
+- `POST /api/auth/reset-password` - Alterar senha com código
 
 ## Backlog (Prioritizado)
 

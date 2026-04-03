@@ -30,6 +30,54 @@ const NewHome = () => {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotStep, setForgotStep] = useState(1);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotCode, setForgotCode] = useState('');
+  const [forgotNewPassword, setForgotNewPassword] = useState('');
+  const [forgotSuccess, setForgotSuccess] = useState('');
+
+  const resetForgot = () => {
+    setForgotStep(1);
+    setForgotEmail('');
+    setForgotCode('');
+    setForgotNewPassword('');
+    setError('');
+    setForgotSuccess('');
+  };
+
+  const handleForgotRequest = async () => {
+    if (!forgotEmail) { setError('Digite seu email'); return; }
+    setIsLoading(true);
+    setError('');
+    try {
+      const res = await (await import('../lib/api')).default.post('/auth/forgot-password', { email: forgotEmail });
+      setForgotSuccess(res.data.hint || 'Código enviado!');
+      setForgotStep(2);
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Email não encontrado');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!forgotCode || !forgotNewPassword) { setError('Preencha todos os campos'); return; }
+    if (forgotNewPassword.length < 6) { setError('A senha deve ter pelo menos 6 caracteres'); return; }
+    setIsLoading(true);
+    setError('');
+    try {
+      await (await import('../lib/api')).default.post('/auth/reset-password', {
+        email: forgotEmail, code: forgotCode, new_password: forgotNewPassword
+      });
+      setForgotStep(3);
+      setForgotSuccess('Senha alterada com sucesso!');
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Código inválido');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const resetRegister = () => {
     setStep(1);
@@ -499,13 +547,81 @@ const NewHome = () => {
               </Button>
             </form>
             <div className="text-center mt-4">
-              <button className="text-sm text-gray-500 hover:underline">Esqueceu a senha?</button>
+              <button
+                data-testid="forgot-password-btn"
+                onClick={() => { setShowLogin(false); setShowForgotPassword(true); resetForgot(); }}
+                className="text-sm text-gray-500 hover:underline"
+              >
+                Esqueceu a senha?
+              </button>
             </div>
             <div className="text-center mt-2">
               <button onClick={() => { setShowLogin(false); setShowCreateAccount(true); setError(''); resetRegister(); }} className="text-sm text-green-600 hover:underline">
                 Não tem conta? Criar conta
               </button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ===== FORGOT PASSWORD MODAL ===== */}
+      <Dialog open={showForgotPassword} onOpenChange={(open) => { if (!isLoading) { setShowForgotPassword(open); if (!open) resetForgot(); } }}>
+        <DialogContent className="max-w-md">
+          <DialogTitle className="sr-only">Recuperar senha</DialogTitle>
+          <div className="p-6">
+            {forgotStep === 1 && (
+              <>
+                <button onClick={() => { setShowForgotPassword(false); setShowLogin(true); resetForgot(); }} className="text-gray-500 hover:text-gray-700 mb-4">
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+                <h2 className="text-xl font-bold text-center mb-2">Recuperar senha</h2>
+                <p className="text-sm text-gray-500 text-center mb-6">Digite seu email para receber o código de verificação</p>
+                {error && <div data-testid="forgot-error" className="bg-red-50 text-red-600 text-sm p-3 rounded-lg mb-4">{error}</div>}
+                <div className="space-y-4">
+                  <Input data-testid="forgot-email" type="email" placeholder="Seu email" className="h-12" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} />
+                  <Button data-testid="forgot-submit" onClick={handleForgotRequest} disabled={isLoading} className="w-full bg-green-500 hover:bg-green-600 h-12 text-white">
+                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enviar código'}
+                  </Button>
+                </div>
+              </>
+            )}
+
+            {forgotStep === 2 && (
+              <>
+                <h2 className="text-xl font-bold text-center mb-2">Verificar código</h2>
+                {forgotSuccess && <div className="bg-green-50 text-green-600 text-sm p-3 rounded-lg mb-4">{forgotSuccess}</div>}
+                {error && <div data-testid="reset-error" className="bg-red-50 text-red-600 text-sm p-3 rounded-lg mb-4">{error}</div>}
+                <p className="text-sm text-gray-500 text-center mb-6">Verifique o código enviado para <strong>{forgotEmail}</strong></p>
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-xs text-gray-500">Código de verificação</Label>
+                    <Input data-testid="reset-code" placeholder="000000" className="h-12 text-center text-lg tracking-widest" maxLength={6} value={forgotCode} onChange={(e) => setForgotCode(e.target.value.replace(/\D/g, ''))} />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-500">Nova senha</Label>
+                    <Input data-testid="reset-new-password" type="password" placeholder="Nova senha (mín. 6 caracteres)" className="h-12" value={forgotNewPassword} onChange={(e) => setForgotNewPassword(e.target.value)} />
+                  </div>
+                  <Button data-testid="reset-submit" onClick={handleResetPassword} disabled={isLoading} className="w-full bg-green-500 hover:bg-green-600 h-12 text-white">
+                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Alterar senha'}
+                  </Button>
+                </div>
+              </>
+            )}
+
+            {forgotStep === 3 && (
+              <div className="text-center py-4">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                </div>
+                <h2 className="text-xl font-bold mb-2">Senha alterada!</h2>
+                <p className="text-sm text-gray-500 mb-6">Sua senha foi alterada com sucesso. Faça login com a nova senha.</p>
+                <Button data-testid="back-to-login-btn" onClick={() => { setShowForgotPassword(false); setShowLogin(true); resetForgot(); }} className="bg-green-500 hover:bg-green-600 text-white px-8">
+                  Fazer login
+                </Button>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>

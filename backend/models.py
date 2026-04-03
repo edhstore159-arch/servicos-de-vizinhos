@@ -30,6 +30,14 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+class PasswordResetConfirm(BaseModel):
+    email: EmailStr
+    code: str
+    new_password: str
+
 class UserUpdate(BaseModel):
     name: Optional[str] = None
     location: Optional[str] = None

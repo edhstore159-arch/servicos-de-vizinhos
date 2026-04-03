@@ -1,7 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends, status
-from models import UserRegister, UserLogin, TokenResponse, UserResponse
+from models import UserRegister, UserLogin, TokenResponse, UserResponse, PasswordResetRequest, PasswordResetConfirm
 from auth_utils import get_password_hash, verify_password, create_access_token, get_current_user
 from datetime import datetime
+import random
+import string
 
 router = APIRouter()
 
@@ -117,3 +119,30 @@ async def get_me(user_id: str = Depends(get_current_user)):
         categories=user.get("categories", []),
         createdAt=user["createdAt"]
     )
+
+@router.post("/forgot-password")
+async def forgot_password(data: PasswordResetRequest):
+    db = get_db()
+    user = await db.users.find_one({"email": data.email})
+    if not user:
+        raise HTTPException(status_code=404, detail="Email não encontrado")
+    
+    code = ''.join(random.choices(string.digits, k=6))
+    await db.password_resets.update_one(
+        {"email": data.email},
+        {"$set": {"email": data.email, "code": code, "createdAt": datetime.utcnow()}},
+        upsert=True
+    )
+    return {"message": "Código de verificação enviado", "hint": f"Use o código: {code}"}
+
+@router.post("/reset-password")
+async def reset_password(data: PasswordResetConfirm):
+    db = get_db()
+    reset = await db.password_resets.find_one({"email": data.email, "code": data.code})
+    if not reset:
+        raise HTTPException(status_code=400, detail="Código inválido ou expirado")
+    
+    hashed = get_password_hash(data.new_password)
+    await db.users.update_one({"email": data.email}, {"$set": {"password": hashed}})
+    await db.password_resets.delete_one({"email": data.email})
+    return {"message": "Senha alterada com sucesso"}

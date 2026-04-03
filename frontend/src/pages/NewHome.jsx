@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { Dialog, DialogContent } from '../components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Search, Wrench, MapPin, Camera, ArrowLeft, Loader2, Building2, User, Briefcase, Eye, EyeOff } from 'lucide-react';
@@ -225,6 +225,7 @@ const NewHome = () => {
       {/* ===== MULTI-STEP REGISTER MODAL ===== */}
       <Dialog open={showCreateAccount} onOpenChange={(open) => { setShowCreateAccount(open); if (!open) resetRegister(); }}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto p-0">
+          <DialogTitle className="sr-only">Criar conta</DialogTitle>
           <div className="p-6">
             {/* Header with back and close */}
             <div className="flex items-center justify-between mb-6">
@@ -457,8 +458,9 @@ const NewHome = () => {
       </Dialog>
 
       {/* ===== LOGIN MODAL ===== */}
-      <Dialog open={showLogin} onOpenChange={(open) => { setShowLogin(open); if (!open) setError(''); }}>
-        <DialogContent className="max-w-md">
+      <Dialog open={showLogin} onOpenChange={(open) => { if (!isLoading) { setShowLogin(open); if (!open) setError(''); } }}>
+        <DialogContent className="max-w-md" onInteractOutside={(e) => { if (isLoading) e.preventDefault(); }}>
+          <DialogTitle className="sr-only">Entrar</DialogTitle>
           <div className="p-6">
             <h2 className="text-2xl font-bold text-center mb-6">Que bom te ver de volta!</h2>
             {error && (

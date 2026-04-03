@@ -5,7 +5,7 @@ import { Card } from '../components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Dialog, DialogContent, DialogTitle } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
-import { Heart, Share2, MessageSquare, MapPin, X, Camera, Globe, ChevronRight, Users, Send, Image as ImageIcon } from 'lucide-react';
+import { Heart, Share2, MessageSquare, MapPin, X, Camera, Globe, ChevronRight, Users, Send, Image as ImageIcon, Video } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -117,6 +117,22 @@ const PostCard = ({ post, onRecommend, onRespond }) => {
             </div>
           )}
 
+          {/* Display post videos - full width, no black borders */}
+          {post.videos && post.videos.length > 0 && (
+            <div className="mt-3 space-y-2" data-testid={`post-videos-${post.id}`}>
+              {post.videos.map((vid, idx) => (
+                <video
+                  key={idx}
+                  src={vid}
+                  controls
+                  playsInline
+                  className="w-full rounded-lg object-cover"
+                  style={{ maxHeight: '400px' }}
+                />
+              ))}
+            </div>
+          )}
+
           <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
             <MapPin className="w-3.5 h-3.5" />
             <span>{post.location}</span>
@@ -176,6 +192,9 @@ const Home = () => {
   const [replyText, setReplyText] = useState('');
   const [recommendedToast, setRecommendedToast] = useState('');
   const fileInputRefs = useRef([]);
+  const cameraInputRef = useRef(null);
+  const videoInputRef = useRef(null);
+  const [postVideos, setPostVideos] = useState([]);
 
   const handlePhotoUpload = (e, index) => {
     const file = e.target.files[0];
@@ -196,6 +215,22 @@ const Home = () => {
     });
   };
 
+  const handleCameraCapture = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setPostPhotos(prev => [...prev, URL.createObjectURL(file)]);
+  };
+
+  const handleVideoUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setPostVideos(prev => [...prev, URL.createObjectURL(file)]);
+  };
+
+  const removeVideo = (index) => {
+    setPostVideos(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handlePublish = () => {
     if (!postText.trim()) return;
     const newPost = {
@@ -207,6 +242,7 @@ const Home = () => {
       location: postAddress,
       budget: 'A combinar',
       images: postPhotos.filter(Boolean),
+      videos: postVideos.filter(Boolean),
       likes: 0,
       recommends: 0,
       responses: 0
@@ -214,6 +250,7 @@ const Home = () => {
     setPosts(prev => [newPost, ...prev]);
     setPostText('');
     setPostPhotos([]);
+    setPostVideos([]);
   };
 
   const handleRespond = (post) => {
@@ -320,7 +357,7 @@ const Home = () => {
               />
 
               <div className="mt-3">
-                <p className="text-sm font-medium mb-1">Adicione fotos</p>
+                <p className="text-sm font-medium mb-1">Adicione fotos e vídeos</p>
                 <p className="text-xs text-gray-500 mb-2">Aumente suas chances em 25% ilustrando sua necessidade.</p>
                 <div className="flex gap-2 flex-wrap">
                   {[0, 1, 2].map((i) => (
@@ -351,6 +388,29 @@ const Home = () => {
                     </div>
                   ))}
                 </div>
+                <div className="flex gap-2 mt-2">
+                  <button onClick={() => cameraInputRef.current?.click()} className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-3 py-1.5 rounded-full hover:bg-green-100 transition-colors" data-testid="camera-capture-btn">
+                    <Camera className="w-3.5 h-3.5" /> Tirar foto
+                  </button>
+                  <button onClick={() => videoInputRef.current?.click()} className="flex items-center gap-1 text-xs text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full hover:bg-blue-100 transition-colors" data-testid="video-upload-btn">
+                    <Video className="w-3.5 h-3.5" /> Vídeo
+                  </button>
+                  <input type="file" ref={cameraInputRef} accept="image/*" capture="environment" className="hidden" onChange={handleCameraCapture} />
+                  <input type="file" ref={videoInputRef} accept="video/*" className="hidden" onChange={handleVideoUpload} />
+                </div>
+                {/* Video previews */}
+                {postVideos.length > 0 && (
+                  <div className="mt-2 space-y-2">
+                    {postVideos.map((vid, idx) => (
+                      <div key={idx} className="relative rounded-lg overflow-hidden" data-testid={`post-video-preview-${idx}`}>
+                        <video src={vid} controls playsInline className="w-full rounded-lg object-cover" style={{ maxHeight: '150px' }} />
+                        <button onClick={() => removeVideo(idx)} className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">

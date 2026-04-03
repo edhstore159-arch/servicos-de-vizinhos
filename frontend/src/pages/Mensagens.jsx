@@ -361,11 +361,19 @@ const Mensagens = () => {
               </div>
 
               <div className="flex items-center justify-center gap-3 mb-4">
-                <button className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50">
-                  <Video className="w-4 h-4 text-gray-500" />
+                <button
+                  onClick={() => { addSystemMessage('Chamada de vídeo iniciada'); showToast('Chamada de vídeo iniciada com ' + conv.name); }}
+                  className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                  data-testid="video-call-btn"
+                >
+                  <Video className="w-4 h-4 text-blue-500" />
                 </button>
-                <button className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50">
-                  <Phone className="w-4 h-4 text-gray-500" />
+                <button
+                  onClick={() => { addSystemMessage('Chamada de voz iniciada'); showToast('Ligando para ' + conv.name + '...'); }}
+                  className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-green-50 hover:border-green-300 transition-colors"
+                  data-testid="phone-call-btn"
+                >
+                  <Phone className="w-4 h-4 text-green-500" />
                 </button>
                 <Button variant="outline" size="sm" className="rounded-full text-xs" data-testid="view-profile-btn">
                   Ver perfil

@@ -217,7 +217,7 @@ const NewHome = () => {
           </div>
           <div className="relative">
             <div className="rounded-2xl overflow-hidden shadow-2xl">
-              <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&h=600&fit=crop" alt="Pessoa trabalhando" className="w-full h-[500px] object-cover" />
+              <img src="https://images.unsplash.com/photo-1555955207-cf6fba0f1f57?w=1200&h=800&fit=crop&q=90" alt="Vizinhos ajudando em serviços" className="w-full h-[500px] object-cover" />
             </div>
           </div>
         </div>

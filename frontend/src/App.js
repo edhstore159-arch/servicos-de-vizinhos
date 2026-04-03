@@ -1,6 +1,8 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Landing from './pages/Landing';
+import NewHome from './pages/NewHome';
 import Home from './pages/Home';
 import Empregos from './pages/Empregos';
 import Mapa from './pages/Mapa';
@@ -17,41 +19,62 @@ import Parametros from './pages/admin/Parametros';
 import { Toaster } from './components/ui/toaster';
 import './App.css';
 
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  if (loading) return null;
+  return isAuthenticated ? children : <Navigate to="/" replace />;
+};
+
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  if (loading) return null;
+  return isAuthenticated ? <Navigate to="/feed" replace /> : children;
+};
+
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/landing" element={<PublicRoute><Landing /></PublicRoute>} />
+      <Route path="/" element={<PublicRoute><NewHome /></PublicRoute>} />
+      <Route path="/feed" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+      <Route path="/empregos" element={<ProtectedRoute><Empregos /></ProtectedRoute>} />
+      <Route path="/mapa" element={<ProtectedRoute><Mapa /></ProtectedRoute>} />
+      <Route path="/mensagens" element={<ProtectedRoute><Mensagens /></ProtectedRoute>} />
+      <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
+      <Route path="/creditos" element={<ProtectedRoute><Creditos /></ProtectedRoute>} />
+      <Route path="/abonamento" element={<ProtectedRoute><Abonamento /></ProtectedRoute>} />
+      <Route path="/assinatura" element={<ProtectedRoute><Assinatura /></ProtectedRoute>} />
+      
+      {/* Admin Routes */}
+      <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="orcamentos" element={<Orcamentos />} />
+        <Route path="clientes" element={<Clientes />} />
+        <Route path="parametros" element={<Parametros />} />
+        <Route path="demandas" element={<AdminDashboard />} />
+        <Route path="perimetro" element={<AdminDashboard />} />
+        <Route path="perfil" element={<AdminDashboard />} />
+        <Route path="editar-perfil" element={<AdminDashboard />} />
+        <Route path="avaliacoes" element={<AdminDashboard />} />
+        <Route path="seo" element={<AdminDashboard />} />
+        <Route path="comunicacao" element={<AdminDashboard />} />
+        <Route path="faturas" element={<AdminDashboard />} />
+        <Route path="recebimentos" element={<AdminDashboard />} />
+        <Route path="catalogo" element={<AdminDashboard />} />
+        <Route path="tutoriais" element={<AdminDashboard />} />
+      </Route>
+    </Routes>
+  );
+}
+
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/landing" element={<Landing />} />
-        <Route path="/" element={<Home />} />
-        <Route path="/empregos" element={<Empregos />} />
-        <Route path="/mapa" element={<Mapa />} />
-        <Route path="/mensagens" element={<Mensagens />} />
-        <Route path="/perfil" element={<Perfil />} />
-        <Route path="/creditos" element={<Creditos />} />
-        <Route path="/abonamento" element={<Abonamento />} />
-        <Route path="/assinatura" element={<Assinatura />} />
-        
-        {/* Admin Routes */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="orcamentos" element={<Orcamentos />} />
-          <Route path="clientes" element={<Clientes />} />
-          <Route path="parametros" element={<Parametros />} />
-          <Route path="demandas" element={<AdminDashboard />} />
-          <Route path="perimetro" element={<AdminDashboard />} />
-          <Route path="perfil" element={<AdminDashboard />} />
-          <Route path="editar-perfil" element={<AdminDashboard />} />
-          <Route path="avaliacoes" element={<AdminDashboard />} />
-          <Route path="seo" element={<AdminDashboard />} />
-          <Route path="comunicacao" element={<AdminDashboard />} />
-          <Route path="faturas" element={<AdminDashboard />} />
-          <Route path="recebimentos" element={<AdminDashboard />} />
-          <Route path="catalogo" element={<AdminDashboard />} />
-          <Route path="tutoriais" element={<AdminDashboard />} />
-        </Route>
-      </Routes>
-      <Toaster />
+      <AuthProvider>
+        <AppRoutes />
+        <Toaster />
+      </AuthProvider>
     </BrowserRouter>
   );
 }

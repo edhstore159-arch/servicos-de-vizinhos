@@ -1,18 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Briefcase, PlusCircle, MessageCircle, MapPin, User, LogOut, Settings, CreditCard } from 'lucide-react';
+import { Home, Briefcase, MessageCircle, MapPin, User, LogOut, Settings, CreditCard } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Badge } from './ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
-import { getCurrentUser } from '../mock/data';
+import { useAuth } from '../context/AuthContext';
 
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const user = getCurrentUser();
+  const { user, logout } = useAuth();
 
   const navItems = [
-    { path: '/', label: 'Início', icon: Home },
+    { path: '/feed', label: 'Início', icon: Home },
     { path: '/empregos', label: 'Empregos', icon: Briefcase },
     { path: '/mensagens', label: 'Mensagens', icon: MessageCircle },
     { path: '/mapa', label: 'Mapa', icon: MapPin },
@@ -20,8 +19,8 @@ const Header = () => {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    navigate('/landing');
+    logout();
+    navigate('/');
   };
 
   return (
@@ -29,7 +28,7 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-3">
         <div className="flex items-center justify-between h-12">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/feed" className="flex items-center space-x-2">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                 S
@@ -60,24 +59,20 @@ const Header = () => {
 
           {/* User Profile with Dropdown */}
           <div className="flex items-center space-x-3">
-            <div className="flex items-center space-x-2 bg-yellow-50 px-3 py-1 rounded-full">
-              <span className="text-sm font-semibold text-yellow-700">💳 {user.credits}</span>
-            </div>
-            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+                <button data-testid="user-menu-trigger" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
                   <Avatar className="w-8 h-8">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={user?.avatar} alt={user?.name || ''} />
+                    <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
                   </Avatar>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium">{user.name}</p>
-                    <p className="text-xs text-gray-500">{user.email}</p>
+                    <p className="text-sm font-medium">{user?.name}</p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />

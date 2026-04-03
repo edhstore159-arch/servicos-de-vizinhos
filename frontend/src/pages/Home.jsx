@@ -1,25 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Header from '../components/Header';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { Heart, Share2, MessageSquare, MapPin, X, Camera, Globe, ChevronRight, Users } from 'lucide-react';
+import { Dialog, DialogContent, DialogTitle } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
+import { Heart, Share2, MessageSquare, MapPin, X, Camera, Globe, ChevronRight, Users, Send, Image as ImageIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const mockPosts = [
+const initialPosts = [
   {
     id: '1',
     userName: 'João S.',
     userAvatar: 'https://i.pravatar.cc/150?img=12',
-    isPro: true,
     time: 'postado às 19:38',
-    title: 'Preciso de ajuda com instalação elétrica',
     description: 'Olá, estou precisando de um eletricista para fazer algumas instalações na minha casa. Tenho 3 pontos de tomada para instalar e preciso trocar o disjuntor principal.',
     location: 'São Paulo, SP - 1.8 km',
     budget: 'A combinar',
-    category: 'Eletricista',
+    images: [],
     likes: 12,
     recommends: 5,
     responses: 6
@@ -28,13 +27,11 @@ const mockPosts = [
     id: '2',
     userName: 'Maria F.',
     userAvatar: 'https://i.pravatar.cc/150?img=45',
-    isPro: false,
     time: 'postado às 19:18',
-    title: 'Preciso de serviço de encanamento para desentupir vaso sanitário',
-    description: 'Olá, preciso de serviço de encanamento para desentupir o vaso sanitário (elétrico). Há vazamento e a descarga não funciona mais corretamente.',
+    description: 'Preciso de professor particular de matemática para minha filha que está no ensino médio. Aulas 2x por semana, preferencialmente aos sábados pela manhã.',
     location: 'Rio de Janeiro, RJ - 3.2 km',
-    budget: 'R$ 300',
-    category: 'Encanador',
+    budget: 'R$ 80/aula',
+    images: [],
     likes: 8,
     recommends: 3,
     responses: 12
@@ -43,13 +40,11 @@ const mockPosts = [
     id: '3',
     userName: 'Carlos O.',
     userAvatar: 'https://i.pravatar.cc/150?img=33',
-    isPro: false,
     time: 'postado às 18:45',
-    title: 'Preciso de alguém com caminhão para mudança',
-    description: 'Olá, preciso agora de alguém com caminhão para mudar comigo um sofá para a zona sul. Urgente!',
-    location: 'Belo Horizonte, MG - 5 km',
-    budget: 'A combinar',
-    category: 'Mudança',
+    description: 'Procuro desenvolvedor para criar um site institucional simples. Preciso de algo profissional mas sem muita complexidade. Prazo de 2 semanas.',
+    location: 'Belo Horizonte, MG - 3 km',
+    budget: 'R$ 2.000',
+    images: [],
     likes: 15,
     recommends: 8,
     responses: 4
@@ -57,31 +52,28 @@ const mockPosts = [
 ];
 
 const themes = [
-  {
-    id: 't1',
-    title: 'Preciso de ajuda para pequenos trabalhos',
-    image: 'https://images.unsplash.com/photo-1567361808960-dec9cb578182?w=400&h=300&fit=crop',
-    likes: '10.0k',
-    shares: '2.7k'
-  },
-  {
-    id: 't2',
-    title: 'Preciso de ajuda para limpeza',
-    image: 'https://images.unsplash.com/photo-1758273238795-c284e5ae09b6?w=400&h=300&fit=crop',
-    likes: '13.1k',
-    shares: '3.5k'
-  },
-  {
-    id: 't3',
-    title: 'É primavera!',
-    image: 'https://images.unsplash.com/photo-1606676539940-12768ce0e762?w=400&h=300&fit=crop',
-    likes: '1.1k',
-    shares: '277'
-  }
+  { id: 't1', title: 'Preciso de ajuda para pequenos trabalhos', image: 'https://images.unsplash.com/photo-1567361808960-dec9cb578182?w=400&h=300&fit=crop', likes: '10.0k', shares: '2.7k' },
+  { id: 't2', title: 'Preciso de ajuda para limpeza', image: 'https://images.unsplash.com/photo-1758273238795-c284e5ae09b6?w=400&h=300&fit=crop', likes: '13.1k', shares: '3.5k' },
+  { id: 't3', title: 'É primavera!', image: 'https://images.unsplash.com/photo-1606676539940-12768ce0e762?w=400&h=300&fit=crop', likes: '1.1k', shares: '277' }
 ];
 
-const PostCard = ({ post }) => {
+const PostCard = ({ post, onRecommend, onRespond }) => {
   const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(post.likes);
+  const [recommended, setRecommended] = useState(false);
+  const [recommendCount, setRecommendCount] = useState(post.recommends);
+
+  const handleLike = () => {
+    setLiked(!liked);
+    setLikeCount(prev => liked ? prev - 1 : prev + 1);
+  };
+
+  const handleRecommend = () => {
+    setRecommended(!recommended);
+    setRecommendCount(prev => recommended ? prev - 1 : prev + 1);
+    if (!recommended && onRecommend) onRecommend(post);
+  };
+
   return (
     <Card className="p-4 mb-3 hover:shadow-md transition-shadow border border-gray-100" data-testid={`post-${post.id}`}>
       <div className="flex items-center justify-between mb-3">
@@ -100,6 +92,21 @@ const PostCard = ({ post }) => {
         <div className="flex-1">
           <h3 className="font-semibold text-sm">{post.userName}</h3>
           <p className="text-sm text-gray-700 mt-1">{post.description}</p>
+
+          {/* Display post images */}
+          {post.images && post.images.length > 0 && (
+            <div className="flex gap-2 mt-3 flex-wrap" data-testid={`post-images-${post.id}`}>
+              {post.images.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={img}
+                  alt={`Foto ${idx + 1}`}
+                  className="w-32 h-24 object-cover rounded-lg border border-gray-200"
+                />
+              ))}
+            </div>
+          )}
+
           <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
             <MapPin className="w-3.5 h-3.5" />
             <span>{post.location}</span>
@@ -110,21 +117,34 @@ const PostCard = ({ post }) => {
         </div>
       </div>
 
-      <div className="text-xs text-gray-400 text-right mb-2">{post.responses} respostas</div>
+      <div className="flex items-center gap-3 text-xs text-gray-400 text-right mb-2 justify-end">
+        <span>{likeCount} curtidas</span>
+        <span>{recommendCount} recomendações</span>
+        <span>{post.responses} respostas</span>
+      </div>
 
       <div className="flex items-center justify-between pt-2 border-t border-gray-100">
         <button
-          onClick={() => setLiked(!liked)}
-          className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors ${liked ? 'text-red-500' : 'text-gray-500'}`}
+          onClick={handleLike}
+          data-testid={`like-btn-${post.id}`}
+          className={`flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg transition-all ${liked ? 'text-red-500 bg-red-50 font-medium' : 'text-gray-500 hover:bg-gray-50'}`}
         >
           <Heart className={`w-4 h-4 ${liked ? 'fill-red-500' : ''}`} />
-          Curtir
+          {liked ? 'Curtido' : 'Curtir'}
         </button>
-        <button className="flex items-center gap-1 text-xs text-gray-500 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">
-          <Users className="w-4 h-4" />
-          Recomendar
+        <button
+          onClick={handleRecommend}
+          data-testid={`recommend-btn-${post.id}`}
+          className={`flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg transition-all ${recommended ? 'text-blue-500 bg-blue-50 font-medium' : 'text-gray-500 hover:bg-gray-50'}`}
+        >
+          <Users className={`w-4 h-4 ${recommended ? 'fill-blue-100' : ''}`} />
+          {recommended ? 'Recomendado' : 'Recomendar'}
         </button>
-        <button className="flex items-center gap-1 text-xs text-gray-500 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">
+        <button
+          onClick={() => onRespond && onRespond(post)}
+          data-testid={`respond-btn-${post.id}`}
+          className="flex items-center gap-1.5 text-xs text-gray-500 px-4 py-2 rounded-lg hover:bg-gray-50 transition-all"
+        >
           <MessageSquare className="w-4 h-4" />
           Responder
         </button>
@@ -137,11 +157,86 @@ const Home = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showBanner, setShowBanner] = useState(true);
-  const [postText, setPostText] = useState('Olá,');
+  const [postText, setPostText] = useState('');
+  const [postPhotos, setPostPhotos] = useState([]);
+  const [postAddress, setPostAddress] = useState(user?.location || 'São Paulo, SP');
+  const [posts, setPosts] = useState(initialPosts);
+  const [showReplyModal, setShowReplyModal] = useState(false);
+  const [replyTarget, setReplyTarget] = useState(null);
+  const [replyText, setReplyText] = useState('');
+  const [recommendedToast, setRecommendedToast] = useState('');
+  const fileInputRefs = useRef([]);
+
+  const handlePhotoUpload = (e, index) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setPostPhotos(prev => {
+      const updated = [...prev];
+      updated[index] = url;
+      return updated;
+    });
+  };
+
+  const removePhoto = (index) => {
+    setPostPhotos(prev => {
+      const updated = [...prev];
+      updated.splice(index, 1);
+      return updated;
+    });
+  };
+
+  const handlePublish = () => {
+    if (!postText.trim()) return;
+    const newPost = {
+      id: `user-${Date.now()}`,
+      userName: user?.name || 'Você',
+      userAvatar: user?.avatar || '',
+      time: 'agora mesmo',
+      description: postText,
+      location: postAddress,
+      budget: 'A combinar',
+      images: postPhotos.filter(Boolean),
+      likes: 0,
+      recommends: 0,
+      responses: 0
+    };
+    setPosts(prev => [newPost, ...prev]);
+    setPostText('');
+    setPostPhotos([]);
+  };
+
+  const handleRespond = (post) => {
+    setReplyTarget(post);
+    setReplyText('');
+    setShowReplyModal(true);
+  };
+
+  const handleSendReply = () => {
+    if (!replyText.trim()) return;
+    setPosts(prev => prev.map(p =>
+      p.id === replyTarget.id ? { ...p, responses: p.responses + 1 } : p
+    ));
+    setShowReplyModal(false);
+    setReplyText('');
+    setReplyTarget(null);
+  };
+
+  const handleRecommend = (post) => {
+    setRecommendedToast(`Você recomendou o pedido de ${post.userName}`);
+    setTimeout(() => setRecommendedToast(''), 3000);
+  };
 
   return (
     <div className="min-h-screen bg-[#FFF5F3] pb-16 md:pb-0">
       <Header />
+
+      {/* Toast for recommendation */}
+      {recommendedToast && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg text-sm animate-in fade-in slide-in-from-top-2" data-testid="recommend-toast">
+          {recommendedToast}
+        </div>
+      )}
 
       {/* Premium Banner */}
       {showBanner && (
@@ -150,12 +245,7 @@ const Home = () => {
             <p className="text-sm text-[#E85D4A] font-medium">
               Acesse novamente ferramentas e serviços exclusivos: torne-se Premier!
             </p>
-            <Button
-              size="sm"
-              className="bg-[#FF6B6B] hover:bg-[#E85D4A] text-white mt-2 rounded-full px-6"
-              onClick={() => navigate('/abonamento')}
-              data-testid="premium-banner-btn"
-            >
+            <Button size="sm" className="bg-[#FF6B6B] hover:bg-[#E85D4A] text-white mt-2 rounded-full px-6" onClick={() => navigate('/abonamento')} data-testid="premium-banner-btn">
               Assinar novamente
             </Button>
             <button onClick={() => setShowBanner(false)} className="absolute right-4 top-3 text-gray-400 hover:text-gray-600">
@@ -168,12 +258,12 @@ const Home = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
           {/* Left Column - Feed */}
           <div className="lg:col-span-2">
-            {/* Posts Feed */}
             <div className="space-y-0">
-              {mockPosts.map((post) => (
-                <PostCard key={post.id} post={post} />
+              {posts.map((post) => (
+                <PostCard key={post.id} post={post} onRecommend={handleRecommend} onRespond={handleRespond} />
               ))}
             </div>
 
@@ -184,7 +274,6 @@ const Home = () => {
                 <h3 className="font-bold text-base">Temáticas do momento</h3>
               </div>
               <p className="text-sm text-gray-500 mb-4">Ganhe tempo: publique todos os seus pedidos em um clique.</p>
-
               <div className="grid grid-cols-3 gap-3">
                 {themes.map((theme) => (
                   <div key={theme.id} className="relative rounded-xl overflow-hidden cursor-pointer group h-48" data-testid={`theme-${theme.id}`}>
@@ -200,18 +289,12 @@ const Home = () => {
                   </div>
                 ))}
               </div>
-
               <div className="text-center mt-4">
                 <Button variant="outline" className="rounded-full text-sm" data-testid="view-all-themes-btn">
                   Ver todas as temáticas
                 </Button>
               </div>
             </div>
-
-            {/* More Posts */}
-            {mockPosts.slice(0, 1).map((post) => (
-              <PostCard key={`extra-${post.id}`} post={{ ...post, id: `extra-${post.id}` }} />
-            ))}
           </div>
 
           {/* Right Column - Sidebar */}
@@ -221,31 +304,62 @@ const Home = () => {
               <textarea
                 value={postText}
                 onChange={(e) => setPostText(e.target.value)}
-                placeholder="Olá,"
-                className="w-full h-20 border border-gray-200 rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-200"
+                placeholder="Descreva o serviço que você precisa..."
+                className="w-full h-24 border border-gray-200 rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-200"
                 data-testid="post-textarea"
               />
 
               <div className="mt-3">
                 <p className="text-sm font-medium mb-1">Adicione fotos</p>
                 <p className="text-xs text-gray-500 mb-2">Aumente suas chances em 25% ilustrando sua necessidade.</p>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   {[0, 1, 2].map((i) => (
-                    <label key={i} className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-green-400 transition-colors">
-                      <Camera className="w-5 h-5 text-gray-400" />
-                      <input type="file" accept="image/*" className="hidden" />
-                    </label>
+                    <div key={i} className="relative">
+                      {postPhotos[i] ? (
+                        <div className="relative w-16 h-16">
+                          <img src={postPhotos[i]} alt={`Foto ${i + 1}`} className="w-16 h-16 object-cover rounded-lg border border-gray-200" />
+                          <button
+                            onClick={() => removePhoto(i)}
+                            className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                            data-testid={`remove-photo-${i}`}
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-green-400 transition-colors" data-testid={`photo-upload-${i}`}>
+                          <Camera className="w-5 h-5 text-gray-400" />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            ref={el => fileInputRefs.current[i] = el}
+                            onChange={(e) => handlePhotoUpload(e, i)}
+                          />
+                        </label>
+                      )}
+                    </div>
                   ))}
                 </div>
               </div>
 
               <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
-                <span className="font-medium">Endereço</span>
-                <span className="text-xs text-gray-400 flex-1 truncate">{user?.location || 'São Paulo, SP'}</span>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
+                <MapPin className="w-4 h-4 text-gray-400" />
+                <Input
+                  value={postAddress}
+                  onChange={(e) => setPostAddress(e.target.value)}
+                  placeholder="Seu endereço"
+                  className="h-8 text-xs border-gray-200"
+                  data-testid="post-address-input"
+                />
               </div>
 
-              <Button className="w-full bg-green-500 hover:bg-green-600 text-white mt-4 rounded-full h-11" data-testid="post-demand-btn">
+              <Button
+                onClick={handlePublish}
+                disabled={!postText.trim()}
+                className="w-full bg-green-500 hover:bg-green-600 text-white mt-4 rounded-full h-11 disabled:opacity-50"
+                data-testid="post-demand-btn"
+              >
                 Publicar meu pedido
               </Button>
             </Card>
@@ -256,13 +370,47 @@ const Home = () => {
               <p className="text-sm text-gray-600 mb-4">
                 Responda aos pedidos publicados perto de você e gere um complemento de renda.
               </p>
-              <Button className="w-full bg-[#FF9B8A] hover:bg-[#FF8A79] text-white rounded-full h-11" data-testid="offer-services-btn">
+              <Button className="w-full bg-[#FF9B8A] hover:bg-[#FF8A79] text-white rounded-full h-11" data-testid="offer-services-btn" onClick={() => navigate('/empregos')}>
                 Propor meus serviços
               </Button>
             </Card>
           </div>
         </div>
       </div>
+
+      {/* Reply Modal */}
+      <Dialog open={showReplyModal} onOpenChange={setShowReplyModal}>
+        <DialogContent className="max-w-md">
+          <DialogTitle className="sr-only">Responder pedido</DialogTitle>
+          {replyTarget && (
+            <div className="p-4">
+              <h3 className="font-bold text-base mb-2">Responder a {replyTarget.userName}</h3>
+              <p className="text-sm text-gray-600 mb-4 bg-gray-50 p-3 rounded-lg">{replyTarget.description}</p>
+              <textarea
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                placeholder="Escreva sua resposta..."
+                className="w-full h-24 border border-gray-200 rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-200"
+                data-testid="reply-textarea"
+              />
+              <div className="flex gap-2 mt-3">
+                <Button variant="outline" onClick={() => setShowReplyModal(false)} className="flex-1">
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={handleSendReply}
+                  disabled={!replyText.trim()}
+                  className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+                  data-testid="send-reply-btn"
+                >
+                  <Send className="w-4 h-4 mr-2" />
+                  Enviar
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

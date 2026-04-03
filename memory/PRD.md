@@ -26,9 +26,9 @@ Construir uma aplicação chamada "servivizinhos" inspirada no allovoisins.com -
 - Logout funcional
 
 ### Páginas
-- **Landing/NewHome (/):** Página inicial para não-autenticados com modais de login e registro
-- **Feed (/feed):** Feed de pedidos públicos, temáticas do momento, sidebar com formulário
-- **Mensagens (/mensagens):** Chat 3 colunas (lista, mensagens, perfil)
+- **Landing/NewHome (/):** Página inicial para não-autenticados com modais de login e registro multi-etapas
+- **Feed (/feed):** Feed interativo de pedidos públicos com botões Curtir/Recomendar/Responder funcionais, upload de fotos nos pedidos, publicação de novos pedidos, temáticas do momento, sidebar com formulário
+- **Mensagens (/mensagens):** Chat 3 colunas com botões de ação funcionais (Recusar com modal, Agendar com data/hora, Pagamento com valor, Ver tudo com opções extra), envio de mensagens e fotos
 - **Empregos (/empregos):** Busca de empregos
 - **Mapa (/mapa):** Mapa de prestadores
 - **Assinatura/Abonamento:** Planos de assinatura
